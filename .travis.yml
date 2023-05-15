@@ -11,5 +11,13 @@ after_success:
   - docker build -t lingta/multi-client ./client
   - docker build -t lingta/multi-nginx ./nginx
   - docker build -t lingta/multi-server ./server
-  - docker build -t lingta/multi-worker ./worker
+  - docker build -t lingta/multi-worker ./worker'
+  # Login to the docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKKER_ID" --password-stdin
+  # Take the images and push tem to docker hub
+  - docker push lingta/multi-client
+  - docker push lingta/multi-nginx
+  - docker push lingta/multi-server
+  - docker push lingta/multi-worker
+
   
