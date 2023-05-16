@@ -1,13 +1,16 @@
 sudo: required
+# Travis uses docker
 services: 
   - docker
+# Travis build the test image
 before_install:
   - docker build -t lingta/react-test -f ./client/Dockerfile.dev ./client
-
+# Travis run the tests
 script:
   - - docker run -e CI=true lingta/react-test npm test
-
+# After all the tests are passed
 after_success:
+  # Traivis build all the images used for deployment
   - docker build -t lingta/multi-client ./client
   - docker build -t lingta/multi-nginx ./nginx
   - docker build -t lingta/multi-server ./server
@@ -19,5 +22,17 @@ after_success:
   - docker push lingta/multi-nginx
   - docker push lingta/multi-server
   - docker push lingta/multi-worker
+deploy:
+  provider: elasticbeanstalk
+  region: us-east-1
+  app: Docker-multi-container
+  env: Docker-multi-container-env
+  bucket_name: elasticbeanstalk-us-east-1-665558350277
+  bucket_path: docker-multi-container
+  on: 
+    branch: main
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY
+
 
   
